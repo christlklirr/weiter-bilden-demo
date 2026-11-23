@@ -9,6 +9,7 @@ Online: **https://christlklirr.github.io/weiter-bilden-demo/**
 
 - **Volltextsuche** über Angebots- und Anbietertexte: mehrere Wörter müssen alle vorkommen, „Anführungszeichen“ suchen feste Wortfolgen, optional nur ganze Wörter. Fundstellen werden hervorgehoben.
 - **Ein Filter für die Anrechnung:** wba-Abschluss und Kompetenzbereich in einem Feld, gegliedert nach Abschluss.
+- **Typ:** Kurs/Seminar oder Lehrgang, wie in der wba-Suche.
 - **Lernformat** (abgeleitet) und **Ort** (Bundesland, online, österreichweit) als je ein Filter.
 - **Starttermin** als kombinierbare Umschalt-Buttons; bereits gestartete Angebote sind hervorgehoben, beendete zurückgenommen.
 - **Meine Kursliste:** Kurse merken (♡), als „angemeldet“ oder „absolviert“ vermerken; der Stand ergibt sich aus dem Termin. Mit Link zur Anmeldung, Kopieren, Sichern und Laden.

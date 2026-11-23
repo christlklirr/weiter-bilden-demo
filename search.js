@@ -36,6 +36,7 @@
  function matches(course,filters){
   const list=terms(filters.query);if(list.length&&!list.every(term=>course.sources.some(s=>hits(s.text,term,filters.whole))))return false;
   if(filters.profile||filters.competency){if(!course.competencies.some(c=>assignmentMatches(c,filters)))return false;}
+  if(filters.type&&course.type!==filters.type)return false;
   if(filters.format&&formatInfo(course).format!==filters.format)return false;
   if(!timingMatches(course,filters.dates,filters.today))return false;
   if(filters.place&&!placeMatches(course,filters.place))return false;

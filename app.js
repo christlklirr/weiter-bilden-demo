@@ -1,6 +1,6 @@
 'use strict';
 const S=window.WbaSearch,D=window.WBA_DATA,U=window.WbaUI,$=id=>document.getElementById(id),{el,link}=U;
-const filterIds=['credit','format','place'];let limit=24;
+const filterIds=['credit','type','format','place'];let limit=24;
 const dateLabels={future:'Startet später',ongoing:'Laufend angeboten',unknown:'Termin unklar',started:'Bereits gestartet',ended:'Bereits beendet'};
 let dates=[...S.defaultDateGroups];
 const number=n=>new Intl.NumberFormat('de-AT',{maximumFractionDigits:2}).format(n);
@@ -21,7 +21,7 @@ function card(c,f){
  const status=store.status(c.id),group=S.dateGroup(c);const article=el('article','course'+(status?' course-'+status:'')+(!status&&group==='started'?' offer-started':'')+(!status&&group==='ended'?' offer-ended':''));const top=el('div','course-top');const side=el('div','course-side');side.append(el('span','course-id','wba · '+c.id),U.heart(c,store.isSaved(c.id)));top.append(el('p','provider',c.provider),side);article.append(top,el('h2','',c.title));
  const flags=el('div','course-flags');flags.append(U.timingBadge(c));const badge=U.phaseBadge(c,status);if(badge)flags.append(badge);article.append(flags);
  const meta=el('div','meta');for(const value of [c.location,c.term])meta.append(el('span','',value));article.append(meta);
- const format=S.formatInfo(c);const bottom=el('div','course-bottom');const chips=el('div','chips');chips.append(el('span','chip',number(c.ue)+' UE'),el('span','chip',number(c.ects)+' ECTS (wba)'),el('span','chip '+(format.inferred?'inferred':'subtle'),format.format==='unklar'?'Lernformat unklar':format.format+(format.inferred?' · abgeleitet':'')));bottom.append(chips,link('wba-Details ↗',c.url));article.append(bottom);
+ const format=S.formatInfo(c);const bottom=el('div','course-bottom');const chips=el('div','chips');if(c.type)chips.append(el('span','chip chip-type',c.type));chips.append(el('span','chip',number(c.ue)+' UE'),el('span','chip',number(c.ects)+' ECTS (wba)'),el('span','chip '+(format.inferred?'inferred':'subtle'),format.format==='unklar'?'Lernformat unklar':format.format+(format.inferred?' · abgeleitet':'')));bottom.append(chips,link('wba-Details ↗',c.url));article.append(bottom);
  const found=S.matchingSources(c,f.query,f.whole);
  if(found.length){const source=found[0],first=S.ranges(source.text,S.terms(f.query),f.whole)[0]||[0,0];const start=Math.max(0,first[0]-95),end=Math.min(source.text.length,first[1]+170);const snippet=el('div','snippet');snippet.append(el('p','snippet-label','FUNDSTELLE · '+source.label));const p=el('p');highlight(p,(start?'… ':'')+source.text.slice(start,end)+(end<source.text.length?' …':''),f);snippet.append(p);article.append(snippet);}
  const personal=el('div','personal-row');personal.append(el('span','personal-label','Meine Teilnahme'),U.statusButtons(c,status));article.append(personal);

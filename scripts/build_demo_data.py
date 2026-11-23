@@ -245,6 +245,8 @@ for i, (title, provider, place, term, ue, ects, fmt, comps, text, contents, has_
     cid = str(990101 + i)
     if title in UNCLEAR_FORMAT:
         fmt = 'unklar'
+    # Typ wie in der wba-Suche: mehrteilige, längere Angebote sind Lehrgänge.
+    kind = 'Lehrgang' if re.search(r'lehrgang|ausbildung|diplom', title, re.I) or ue >= 20 else 'Kurs/Seminar'
     url = f'https://example.org/wba-demo/angebot/{cid}'
     link = f'https://example.org/{slug(provider)}/kurse/{slug(title)}'
     comps = sorted(comps, key=lambda c: PROFILE_ORDER.index(c[0]))
@@ -258,7 +260,7 @@ for i, (title, provider, place, term, ue, ects, fmt, comps, text, contents, has_
                                 '. Anmeldung und weitere Termine auf unserer Website. (Alle Angaben sind erfunden.)'})
     conf, reason = REASONS[fmt]
     courses.append({
-        'id': cid, 'title': title, 'provider': provider, 'location': place,
+        'id': cid, 'title': title, 'type': kind, 'provider': provider, 'location': place,
         'states': [s for s in STATES if s in place], 'online': 'online' in place.lower(),
         'nationwide': 'österreichweit' in place.lower(), 'term': term, 'ue': ue, 'ects': ects,
         'span': span(term), 'format': fmt, 'confidence': conf, 'reason': reason, 'url': url,
