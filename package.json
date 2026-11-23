@@ -1,0 +1,1 @@
+{"name":"weiter-bilden-demo","version":"2.0.0","private":true,"description":"Demo einer Kurssuche mit persönlicher Kursliste (Beispieldaten)","scripts":{"test":"node --test search.test.cjs course-progress.test.cjs favorites.test.cjs store.test.cjs","start":"node server.cjs"}}

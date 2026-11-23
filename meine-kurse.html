@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Meine gemerkten, angemeldeten und absolvierten wba-Kurse mit Links zur Anmeldung."><title>Meine Kursliste · weiter bilden (Demo)</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="theme.css"><script defer src="data.js"></script><script defer src="search.js"></script><script defer src="course-progress.js"></script><script defer src="favorites.js"></script><script defer src="store.js"></script><script defer src="ui.js"></script><script defer src="mylist.js"></script></head>
+<body>
+ <header><a class="brand" href="./"><span class="brand-icon" aria-hidden="true">w.</span>weiter bilden</a><span class="header-note">Demo · Beispieldaten</span></header>
+ <main>
+  <div class="demo-banner" role="note"><strong>Demo mit Beispieldaten.</strong> Alle Kurse, Anbieter, Texte und Links sind erfunden. Die Kompetenzbereiche entsprechen den wba-Qualifikationsprofilen.</div>
+  <nav class="app-nav" aria-label="App-Bereiche"><a href="index.html">Angebote suchen</a><a href="meine-kurse.html" aria-current="page"><span aria-hidden="true">♥</span> Meine Kursliste <span class="nav-count" data-list-count></span></a></nav>
+  <section class="intro"><p class="eyebrow">MEINE KURSE</p><h1>Meine Kursliste <span class="info"><button type="button" class="info-btn" aria-expanded="false" aria-controls="info-list" aria-label="Info: Wo wird die Kursliste gespeichert?">i</button><span class="info-pop" id="info-list" role="note" hidden>Die Liste bleibt in diesem Browser auf diesem Gerät gespeichert – auch nach dem Schließen – und wird nirgends hin übertragen. Die Seite bittet den Browser, sie dauerhaft zu behalten. Leer ist sie in einem anderen Browser, auf einem anderen Gerät, im privaten Fenster, nach dem Löschen der Browserdaten und in Safari nach 7 Tagen ohne Besuch. Mit „Liste sichern“ und „Liste laden“ nimmst du sie mit; „Liste laden“ ergänzt die vorhandene Liste, statt sie zu ersetzen. „Absolviert“ ist deine eigene Angabe, keine wba-Anerkennung.</span></span></h1><p>Mit ♡ gemerkte Kurse und deine Anmeldungen, mit Link zur Anmeldung beim Anbieter.</p></section>
+  <div class="list-tools"><button class="text-button" id="copy-list" type="button">Liste kopieren</button><button class="text-button" id="export-list" type="button">Liste sichern ↓</button><button class="text-button" id="import-list" type="button">Liste laden ↑</button><input id="import-file" type="file" accept="application/json,.json" hidden></div>
+  <p class="list-status" id="list-status" role="status" aria-live="polite"></p>
+  <div id="list"></div>
+  <div class="empty" id="list-empty" hidden><h2>Noch keine Kurse</h2><p>Tippe in der <a href="index.html">Angebotssuche</a> bei einem Kurs auf ♡ oder auf „Angemeldet“. Er erscheint dann hier.</p></div>
+  <noscript>Bitte JavaScript aktivieren, um die Kursliste zu sehen.</noscript>
+ </main><footer>Ein privates Demo-Projekt · keine offizielle wba-Anwendung · Beispieldaten <a href="https://login.wba.or.at/bildungsangebotssuche" target="_blank" rel="noopener noreferrer">Zur echten wba-Suche ↗</a></footer>
+</body></html>

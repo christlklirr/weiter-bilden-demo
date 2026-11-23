@@ -1,0 +1,15 @@
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.env
+.env.*
+wba-mein-kompetenzstand-*.json
+wba-mein-kursstand-*.json
+wba-meine-kursliste-*.json
+
+wba-meine-auswertung-*.txt
+
+# Qualifikationsprofil der wba: von der offiziellen Quelle laden, nicht weiterverbreiten
+qualifikationsprofil-wba-zertifikat.pdf

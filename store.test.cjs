@@ -1,0 +1,9 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const C=require('./course-progress.js'),F=require('./favorites.js'),St=require('./store.js');
+function memory(){const m=new Map();return{getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v))};}
+const ids=['1','2','3'];
+
+test('Kursliste enthält gemerkte und angemeldete/absolvierte Kurse',()=>{const s=St.create(memory(),ids,C,F);s.toggleSaved('1');s.setStatus('2','registered');assert.deepEqual(s.ids().sort(),['1','2']);assert(s.isSaved('1'));assert(!s.isSaved('2'));assert.equal(s.status('2'),'registered');});
+test('Erneuter Klick nimmt den Vermerk zurück; Wechsel zwischen angemeldet und absolviert',()=>{const s=St.create(memory(),ids,C,F);s.setStatus('1','registered');s.setStatus('1','completed');assert.equal(s.status('1'),'completed');s.setStatus('1','completed');assert.equal(s.status('1'),'');assert.deepEqual(s.ids(),[]);});
+test('Stand überlebt Neuladen; Änderungen melden sich',()=>{const mem=memory();let calls=0;const a=St.create(mem,ids,C,F);a.onChange(()=>calls++);a.toggleSaved('3');a.setStatus('3','registered');assert.equal(calls,2);const b=St.create(mem,ids,C,F);assert(b.isSaved('3'));assert.equal(b.status('3'),'registered');});
+test('Sicherungsdatei: neues Format und alte Exporte werden gelesen, Fremdes abgelehnt',()=>{assert.deepEqual(St.parseBackup({type:'wba-kursliste',favorites:['1','9'],courses:{'2':'completed'}},ids,C,F),{favorites:['1'],progress:{'2':'completed'}});assert.deepEqual(St.parseBackup({type:'wba-course-progress',schema:1,courses:{'1':'started'}},ids,C,F),{favorites:null,progress:{'1':'registered'}});assert.deepEqual(St.parseBackup({answers:{},courseProgress:{'3':'completed'}},ids,C,F).progress,{'3':'completed'});assert.throws(()=>St.parseBackup({foo:1},ids,C,F));});

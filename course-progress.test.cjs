@@ -1,0 +1,11 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');const C=require('./course-progress.js'),S=require('./search.js');
+test('Angemeldete und absolvierte Kurse bleiben getrennt',()=>{const statuses={'142614':'registered','138247':'completed'};assert(C.matches(statuses['142614'],'registered'));assert(!C.matches(statuses['142614'],'completed'));assert(C.matches(undefined,'unmarked'));assert(C.matches(statuses['138247'],''));});
+test('Kursmarkierungen überleben Speichern und Lesen mit stabilen IDs',()=>{const map=new Map(),storage={getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v)};const input={'142614':'registered'};C.write(storage,input,['142614']);assert.deepEqual(C.read(storage,['142614']),input);C.write(storage,{},['142614']);assert.deepEqual(C.read(storage,['142614']),{});});
+test('Import akzeptiert nur vorhandene Kurs-IDs und bekannte Statuswerte',()=>{assert.throws(()=>C.validate({'unknown':'registered'},['142614']));assert.throws(()=>C.validate({'142614':'credited'},['142614']));assert.throws(()=>C.validate({'999999':'registered'},['142614']));assert.deepEqual(C.validate({'142614':'completed'},['142614']),{'142614':'completed'});});
+test('Alte Vermerke „begonnen“ werden als „angemeldet“ übernommen',()=>{assert.deepEqual(C.validate({'142614':'started'},['142614']),{'142614':'registered'});});
+test('Angemeldet zeigt je nach Termin: startet, läuft, vorbei oder jederzeit machbar',()=>{const today='2026-11-10',p=term=>C.phase('registered',S.timing({term},today),today).key;
+ assert.equal(p('01.12.2026 - 30.06.2027'),'upcoming');assert.equal(C.phase('registered',S.timing({term:'01.12.2026'},today),today).label,'Angemeldet · Start am 01.12.2026');
+ assert.equal(p('01.09.2026 - 30.06.2027'),'running');assert.equal(p('10.11.2026'),'running');
+ assert.equal(p('01.09.2026 - 30.09.2026'),'finished');assert.equal(p('05.11.2026'),'finished');
+ assert.equal(p('wird laufend angeboten'),'selfpaced');assert.equal(p('Termin folgt'),'selfpaced');
+ assert.equal(C.phase('completed',S.timing({term:'01.12.2026'},today),today).key,'completed');assert.equal(C.phase(undefined,S.timing({term:'01.12.2026'},today),today),null);});
