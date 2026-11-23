@@ -1,7 +1,7 @@
 # Weiter bilden · Demo
 
 Demo einer Kurssuche für wba-anrechenbare Bildungsangebote, mit persönlicher Kursliste.
-**Alle Kurse, Anbieter, Texte und Links sind erfunden.** Nur die Namen der Kompetenzbereiche stammen aus den öffentlichen Qualifikationsprofilen der Weiterbildungsakademie Österreich (wba). Kein offizielles wba-Angebot.
+**Alle 50 Kurse, Anbieter, Texte und Links sind erfunden.** Die Verteilung (Termine, Lernformat, Ort, Bundesländer, Abschlüsse) ist an die echten wba-Daten angelehnt. Nur die Namen der Kompetenzbereiche stammen aus den öffentlichen Qualifikationsprofilen der Weiterbildungsakademie Österreich (wba). Kein offizielles wba-Angebot.
 
 Online: **https://christlklirr.github.io/weiter-bilden-demo/**
 
