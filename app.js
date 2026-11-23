@@ -1,7 +1,7 @@
 'use strict';
 const S=window.WbaSearch,D=window.WBA_DATA,U=window.WbaUI,$=id=>document.getElementById(id),{el,link}=U;
 const filterIds=['credit','type','format','place'];let limit=24;
-const dateLabels={future:'Startet später',ongoing:'Laufend angeboten',unknown:'Termin unklar',started:'Bereits gestartet',ended:'Bereits beendet'};
+const dateLabels={future:'Startet später',ongoing:'Kein Termin eingetragen',unknown:'Termin unklar',started:'Bereits gestartet',ended:'Bereits beendet'};
 let dates=[...S.defaultDateGroups];
 const number=n=>new Intl.NumberFormat('de-AT',{maximumFractionDigits:2}).format(n);
 
@@ -27,7 +27,7 @@ function card(c,f){
  const personal=el('div','personal-row');personal.append(el('span','personal-label','Meine Teilnahme'),U.statusButtons(c,status));article.append(personal);
  const details=el('details','course-details');details.append(el('summary','',f.query?'Fundstellen, Volltexte & Anrechnung':'Volltexte & Anrechnung'));const content=el('div','detail-content');
  if(c.missingProviderText)content.append(el('p','notice','Keine Anbieterbeschreibung erfasst. Der wba-Text ist durchsuchbar.'));
- if(format.inferred)content.append(el('p','rule-note','Suchregel: „Wird laufend angeboten“ wird hier als asynchrones E-Learning eingeordnet. Diese Annahme ist keine bestätigte Formatangabe des Anbieters.'));
+ if(format.inferred)content.append(el('p','rule-note','Lernformat abgeleitet aus dem wba-Eintrag: „'+format.evidence+'“ – keine bestätigte Formatangabe.'));
  content.append(el('p','', 'Ursprüngliche Klassifikation: '+c.format+'. '+c.reason+' · Konfidenz der ursprünglichen Klassifikation: '+c.confidence));
  if(c.span!=null)content.append(el('p','',number(c.span)+' Tage Kalenderspanne (keine Unterrichtsdauer).'));
  const assignments=c.competencies.filter(x=>S.assignmentMatches(x,f));
@@ -52,7 +52,7 @@ if(D&&D.courses){
  $('results').addEventListener('click',e=>{const fav=e.target.closest('[data-favorite]');if(fav){const id=fav.dataset.favorite;store.toggleSaved(id);$('live').textContent=store.isSaved(id)?'Auf die Kursliste gesetzt.':'Von der Kursliste entfernt.';render();$('results').querySelector('[data-favorite="'+id+'"]')?.focus();return;}const st=e.target.closest('[data-status]');if(st){const {course,status}=st.dataset;store.setStatus(course,status);$('live').textContent=store.status(course)==='registered'?'Als angemeldet vermerkt. Der Kurs steht in deiner Kursliste.':store.status(course)==='completed'?'Als absolviert vermerkt (eigene Angabe).':'Vermerk entfernt.';render();$('results').querySelector('[data-course="'+course+'"][data-status="'+status+'"]')?.focus();}});
  $('date-chips').addEventListener('click',e=>{const b=e.target.closest('[data-date]');if(!b)return;const g=b.dataset.date;dates=dates.includes(g)?dates.filter(x=>x!==g):S.dateGroups.filter(x=>x===g||dates.includes(x));limit=24;render();$('date-chips').querySelector('[data-date="'+g+'"]').focus();});
  window.addEventListener('storage',e=>{if(store.keys.includes(e.key)){store.reload();render();}});
- const inferred=D.courses.filter(c=>S.formatInfo(c).inferred).length,unclear=D.courses.filter(c=>S.formatInfo(c).format==='unklar').length;$('format-status').textContent='Aktuell: '+inferred+' Angebote nach der Suchregel als asynchrones E-Learning eingeordnet, '+unclear+' Lernformate unklar.';
+ const inferred=D.courses.filter(c=>S.formatInfo(c).inferred).length,unclear=D.courses.filter(c=>S.formatInfo(c).format==='unklar').length;$('format-status').textContent='Aktuell: '+inferred+' Lernformate aus dem wba-Eintrag abgeleitet, '+unclear+' unklar.';
  let timer;$('query').addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(()=>{limit=24;render();},160);});$('search-form').addEventListener('submit',e=>{e.preventDefault();clearTimeout(timer);limit=24;render();});
  for(const id of [...filterIds,'sort','whole'])$(id).addEventListener('change',()=>{if(id==='credit')creditHelp();limit=24;render();});
  $('reset').addEventListener('click',()=>{clearTimeout(timer);$('query').value='';$('whole').checked=false;for(const id of filterIds)$(id).value='';creditHelp();dates=[...S.defaultDateGroups];$('sort').value='title';limit=24;render();$('query').focus();});$('more').addEventListener('click',()=>{limit+=24;render();});render();

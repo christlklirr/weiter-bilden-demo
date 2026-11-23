@@ -17,7 +17,32 @@
  // One place filter: "online", "nationwide" or "state:<Bundesland>", all read from the wba place field.
  function placeMatches(course,place){if(place==='online')return course.online===true;if(place==='nationwide')return course.nationwide===true;if(place.startsWith('state:'))return course.states.includes(place.slice(6));return true;}
  const displayDate=iso=>/^\d{4}-\d{2}-\d{2}$/.test(iso||'')?iso.slice(8,10)+'.'+iso.slice(5,7)+'.'+iso.slice(0,4):'';
- function formatInfo(course){const inferred=fold(course.term).trim()==='wird laufend angeboten'&&course.format!=='Blended';return {format:inferred?'asynchrones E-Learning':course.format,inferred};}
+ // Lernformat: the original classification wins. If it is "unklar", the course texts are searched for clear cues.
+ // Exactly one kind of cue → that format (marked as derived, with the text passage); none or conflicting cues → stays "unklar".
+ // "Wird laufend angeboten" alone says nothing about the format (it usually just means no date was entered).
+ const formatCues=[
+  // Only phrases that describe how the course itself runs. Words such as "vor Ort", "Seminarraum", "Webinar" or
+  // "Selbststudium" also appear in site menus or as one part of a mixed course and caused wrong results.
+  ['Blended',/auch online|tlw\. module|teilweise online|modul \d+ "?live-online|präsenz und (?:einige[n]? )?online|präsenz- und online|online und (?:in )?präsenz|online- und präsenz|hybrid|blended/i],
+  ['asynchrones E-Learning',/selbstlernkurs|im eigenen tempo|in ihrem eigenen tempo|zeit- und ortsunabhängig|ohne zeitliche bindung|on[- ]demand/i],
+  ['Live-Webinar',/live-online|online-live|liveonline|(?:via|per) (?:zoom|ms teams|microsoft teams)|kursort:? online|videokonferenz/i],
+  ['Präsenz',/präsenzunterricht|präsenzveranstaltung|präsenztermine?\b|präsenzseminar|in präsenz statt|findet in präsenz|als präsenz/i]];
+ // A passage naming three or more formats side by side is a filter menu of the provider site, not a course statement.
+ const formatWords=/präsenz|live-online|online-live|e-learning|blended|webinar|selbststudium/gi;
+ const isMenu=text=>new Set((text.match(formatWords)||[]).map(w=>w.toLowerCase())).size>=3;
+ function cueIn(text,re){const g=new RegExp(re.source,'gi');let m;while((m=g.exec(text))){const a=Math.max(0,m.index-45),b=Math.min(text.length,m.index+m[0].length+45),win=text.slice(a,b);if(!isMenu(win))return (a?'…':'')+win.replace(/\s+/g,' ').trim()+(b<text.length?'…':'');}return null;}
+ function cuesIn(sources){const found=[];for(const [format,re] of formatCues)for(const s of sources){const evidence=cueIn(s.text,re);if(evidence){found.push({format,evidence,source:s.label});break;}}
+  // A mixed statement ("Präsenz und Online-Live") explains the single cues it contains.
+  return found.some(f=>f.format==='Blended')?found.filter(f=>f.format==='Blended'):found;}
+ const formatCache=new WeakMap();
+ function formatInfo(course){
+  if(course.format&&course.format!=='unklar')return {format:course.format,inferred:false};
+  if(formatCache.has(course))return formatCache.get(course);
+  // Only the wba entry (first source) counts. Provider pages contain menus, teasers for other courses and topic texts,
+  // e.g. every BFI Wien page advertises some other course as "Live-Online", which led to wrong results.
+  const found=cuesIn((course.sources||[]).slice(0,1));
+  const result=found.length===1?{format:found[0].format,inferred:true,evidence:found[0].evidence,source:found[0].source}:{format:'unklar',inferred:false,conflict:found.length>1?found.map(f=>f.format):null};
+  formatCache.set(course,result);return result;}
  const profileOrder=['wba-Zertifikat','wba-Basisbildungszertifikat','wba-Diplom Lehren/Gruppenleitung/Training','wba-Diplom Beratung','wba-Diplom Bildungsmanagement','wba-Diplom Bibliothekswesen','Diplomübergreifend'];
  function competencyGroups(courses,profile=''){
   const groups=new Map();

@@ -12,10 +12,21 @@ test('Ein Ortsfilter für online, österreichweit und Bundesland; Datum als TT.M
 test('Typ-Filter trennt Kurs/Seminar und Lehrgang; alle Angebote haben einen Typ',()=>{const k={sources:[],states:[],competencies:[],type:'Kurs/Seminar'},l={...k,type:'Lehrgang'};assert(S.matches(k,{type:'Kurs/Seminar'}));assert(!S.matches(l,{type:'Kurs/Seminar'}));assert(S.matches(l,{}));assert(courses.every(c=>['Kurs/Seminar','Lehrgang'].includes(c.type)));assert(courses.some(c=>c.type==='Lehrgang')&&courses.some(c=>c.type==='Kurs/Seminar'));});
 test('Start heute zählt als bereits gestartet; mehrere Gruppen sind kombinierbar',()=>{const today='2026-11-10';assert.equal(S.dateGroup({term:'10.11.2026'},today),'started');assert(!S.timingMatches({term:'10.11.2026'},S.defaultDateGroups,today));assert(S.timingMatches({term:'10.11.2026'},['started'],today));assert(S.timingMatches({term:'01.09.2026 - 30.09.2026'},['started','ended'],today));assert(!S.timingMatches({term:'wird laufend angeboten'},[],today));assert(S.timingMatches({term:'wird laufend angeboten'},undefined,today));});
 test('Fehlende Dauer wird am Ende sortiert; ECTS werden numerisch sortiert',()=>{assert(S.compare('span-asc')({span:null,title:'A'},{span:3,title:'B'})>0);assert(S.compare('ects-desc')({ects:10,title:'A'},{ects:2,title:'B'})<0);});
-test('Laufende Angebote werden abgeleitet als asynchron gefiltert, Blended hat Vorrang',()=>{
- const ongoing=courses.filter(c=>c.term==='wird laufend angeboten');assert.equal(ongoing.length,27);
- for(const c of ongoing){const original=c.format;const result=S.formatInfo(c);assert.equal(result.format,original==='Blended'?'Blended':'asynchrones E-Learning');assert.equal(result.inferred,original!=='Blended');assert(S.matches(c,{format:result.format}));assert.equal(c.format,original);}
- assert.equal(S.formatInfo({term:'01.12.2026',format:'Live-Webinar'}).format,'Live-Webinar');
+test('Lernformat: Original hat Vorrang, „laufend angeboten“ allein ergibt kein Format',()=>{
+ assert.equal(S.formatInfo({format:'Live-Webinar',sources:[{text:'im eigenen Tempo'}]}).format,'Live-Webinar');
+ const f=S.formatInfo({term:'wird laufend angeboten',format:'unklar',sources:[{text:'Lehrgang in Graz. Wird laufend angeboten.'}]});assert.equal(f.format,'unklar');assert.equal(f.inferred,false);
+ assert.equal(courses.filter(c=>c.term==='wird laufend angeboten').length,27);
+ for(const c of courses){const r=S.formatInfo(c);assert(S.matches(c,{format:r.format}));if(r.inferred)assert(r.evidence&&r.evidence.length>0);}
+});
+test('Lernformat wird nur aus eindeutigen Angaben im wba-Eintrag abgeleitet, mit Fundstelle',()=>{
+ const c=t=>({format:'unklar',sources:[{label:'wba',text:t},{label:'Anbieter',text:'Menü: Präsenz Live-Online E-Learning · Andere Kurse: Live-Online Nächster Starttermin'}]});
+ let r=S.formatInfo(c('Zusatzinformationen: Kursort Online via Zoom'));assert.equal(r.format,'Live-Webinar');assert(r.inferred);assert(r.evidence.includes('via Zoom'));
+ assert.equal(S.formatInfo(c('Zusatzinformationen: Auch online via Zoom / MS Teams')).format,'Blended');
+ assert.equal(S.formatInfo(c('Es gibt Termine in Präsenz und Online-Live')).format,'Blended');
+ assert.equal(S.formatInfo(c('Der Unterricht erfolgt als Präsenzunterricht in Linz')).format,'Präsenz');
+ assert.equal(S.formatInfo(c('Lernen Sie im eigenen Tempo')).format,'asynchrones E-Learning');
+ assert.equal(S.formatInfo(c('Start jederzeit möglich!')).format,'unklar');
+ assert.equal(S.formatInfo(c('Lernformat Präsenz Live-Online E-Learning')).format,'unklar');
 });
 test('Kompetenzen sind nach Abschluss gegliedert und gleichnamige Bereiche bleiben getrennt',()=>{
  const groups=S.competencyGroups(courses);assert.equal(groups[0].profile,'wba-Zertifikat');assert(groups.some(g=>g.profile==='Diplomübergreifend'));assert(groups.length>=7);

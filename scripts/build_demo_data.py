@@ -216,6 +216,17 @@ COURSES = [
   ['Visualisierung', 'Selbstgespräche', 'Fokus halten'], True),
 ]
 
+# Wie im echten wba-Feld „Zusatzinformationen“: bei manchen Angeboten steht dort, wie der Kurs stattfindet.
+EXTRA_INFO = {
+    'Lehrgang Erwachsenenbildung kompakt': 'Auch online via Zoom / MS Teams',
+    'Trainer:innenausbildung mit Praxisprojekt': 'Es gibt Termine in Präsenz und einige Online-Live',
+    'Bildungsberatung für Erwachsene': 'Modul 3 "Live-Online"',
+    'E-Learning-Kurse gestalten mit Moodle': 'Lernen im eigenen Tempo, Start jederzeit möglich',
+    'Supervision und Intervision für Beratende': 'Kursort Online via Zoom',
+    'Kommunikation und Gesprächsführung': 'Kursort Online via Zoom',
+    'Kursleiter:innen-Basis für Volksbildung': 'Der Kurs findet als Präsenzveranstaltung in Bad Ischl statt',
+}
+
 # Wie in den echten wba-Daten fehlt bei den meisten Angeboten ein eindeutiges Lernformat.
 UNCLEAR_FORMAT = {'Beratungsgespräche professionell führen', 'Projektmanagement in Bildungseinrichtungen', 'Bildungsmarketing mit kleinem Budget',
                   'Basisbildung: Alphabetisierung in der Praxis', 'Gruppendynamik verstehen und steuern', 'Feedback und Leistungsbeurteilung in Kursen',
@@ -252,7 +263,9 @@ for i, (title, provider, place, term, ue, ects, fmt, comps, text, contents, has_
     comps = sorted(comps, key=lambda c: PROFILE_ORDER.index(c[0]))
     credit = '; '.join(f'{p}: {n} ({e:.1f} ECTS)' for p, n, e in comps) or 'keine'
     wba_text = (f'Bildungsangebot (Beispieldaten) {title} {provider} Umfang: {ue} UE / {str(ects).replace(".", ",")} ECTS (wba) '
-                f'Termin: {term} Veranstaltungsort: {place} Anrechnung: {credit}. {text}')
+                f'Termin: {term} Veranstaltungsort: {place} '
+                + (f'Zusatzinformationen: {EXTRA_INFO[title]} ' if title in EXTRA_INFO else '')
+                + f'Anrechnung: {credit}. {text}')
     sources = [{'label': 'wba · Angebot und Anerkennung (Beispiel)', 'url': url, 'text': wba_text}]
     if has_provider_text:
         sources.append({'label': 'Anbieterseite · Beispieltext', 'url': link,
